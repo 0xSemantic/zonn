@@ -1,25 +1,45 @@
 package keeper
 
 import (
-	"context"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/0xSemantic/zonn/x/identity/types"
 )
 
-// InitGenesis initializes the module's state from a provided genesis state.
-func (k Keeper) InitGenesis(ctx context.Context, genState types.GenesisState) error {
-	return k.Params.Set(ctx, genState.Params)
+func (k Keeper) InitGenesis(ctx sdk.Context, genState types.GenesisState) {
+	k.SetParams(ctx, genState.Params)
+
+	for _, profile := range genState.Profiles {
+		store := ctx.KVStore(k.storeKey)
+		profileStore := prefix.NewStore(store, []byte(types.ProfileKeyPrefix))
+		b := k.cdc.MustMarshal(&profile)
+		profileStore.Set([]byte(profile.ProfileId), b)
+
+		walletStore := prefix.NewStore(store, []byte(types.WalletToProfileKeyPrefix))
+		walletStore.Set([]byte(profile.PrimaryAddress), []byte(profile.ProfileId))
+
+		for _, linked := range profile.LinkedAddresses {
+			walletStore.Set([]byte(linked), []byte(profile.ProfileId))
+		}
+	}
 }
 
-// ExportGenesis returns the module's exported genesis.
-func (k Keeper) ExportGenesis(ctx context.Context) (*types.GenesisState, error) {
-	var err error
+func (k Keeper) ExportGenesis(ctx sdk.Context) *types.GenesisState {
+	params := k.GetParams(ctx)
 
-	genesis := types.DefaultGenesis()
-	genesis.Params, err = k.Params.Get(ctx)
-	if err != nil {
-		return nil, err
+	profiles := []types.Profile{}
+	store := ctx.KVStore(k.storeKey)
+	profileStore := prefix.NewStore(store, []byte(types.ProfileKeyPrefix))
+	iterator := sdk.KVStorePrefixIterator(profileStore, []byte{})
+	defer iterator.Close()
+	for ; iterator.Valid(); iterator.Next() {
+		var profile types.Profile
+		k.cdc.MustUnmarshal(iterator.Value(), &profile)
+		profiles = append(profiles, profile)
 	}
 
-	return genesis, nil
+	return &types.GenesisState{
+		Profiles: profiles,
+		Params:   params,
+	}
 }

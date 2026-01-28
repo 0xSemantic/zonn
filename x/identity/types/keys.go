@@ -1,7 +1,5 @@
 package types
 
-import "cosmossdk.io/collections"
-
 const (
 	// ModuleName defines the module name
 	ModuleName = "identity"
@@ -9,11 +7,22 @@ const (
 	// StoreKey defines the primary module store key
 	StoreKey = ModuleName
 
-	// GovModuleName duplicates the gov module's name to avoid a dependency with x/gov.
-	// It should be synced with the gov module's name if it is ever changed.
-	// See: https://github.com/cosmos/cosmos-sdk/blob/v0.52.0-beta.2/x/gov/types/keys.go#L9
-	GovModuleName = "gov"
+	// MemStoreKey defines the in-memory store key
+	MemStoreKey = "mem_identity"
+
+	// ProfileKeyPrefix is the prefix for profile store
+	ProfileKeyPrefix = "Profile/value/"
+
+	// WalletToProfileKeyPrefix is the prefix for wallet to profile mapping
+	WalletToProfileKeyPrefix = "WalletToProfile/value/"
 )
 
-// ParamsKey is the prefix to retrieve all Params
-var ParamsKey = collections.NewPrefix("p_identity")
+// ProfileKey returns the store key to retrieve a Profile by ID
+func ProfileKey(profileId string) []byte {
+	return []byte(ProfileKeyPrefix + profileId)
+}
+
+// WalletToProfileKey returns the store key for wallet to profile ID mapping
+func WalletToProfileKey(walletAddr string) []byte {
+	return []byte(WalletToProfileKeyPrefix + walletAddr)
+}
