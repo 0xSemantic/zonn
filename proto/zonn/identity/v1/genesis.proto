@@ -1,0 +1,19 @@
+syntax = "proto3";
+package zonn.identity.v1;
+
+import "gogoproto/gogo.proto";
+import "zonn/identity/v1/query.proto";
+
+option go_package = "github.com/0xSemantic/zonn/x/identity/types";
+
+// GenesisState defines the identity module's genesis state.
+message GenesisState {
+  repeated Profile profiles = 1;
+  Params params = 2;
+}
+
+// Params defines the identity module parameters.
+message Params {
+  int64 max_username_length = 1;
+  string default_metadata_uri = 2;
+}

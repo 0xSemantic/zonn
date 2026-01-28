@@ -1,0 +1,44 @@
+syntax = "proto3";
+package zonn.identity.v1;
+
+import "gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+import "cosmos_proto/cosmos.proto";
+
+option go_package = "github.com/0xSemantic/zonn/x/identity/types";
+
+// QueryProfileRequest is the request type for the Profile RPC method.
+message QueryProfileRequest {
+  string profile_id = 1;
+}
+
+message QueryProfileResponse {
+  Profile profile = 1;
+}
+
+// QueryProfileByWalletRequest is the request type for ProfileByWallet RPC.
+message QueryProfileByWalletRequest {
+  string wallet_address = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+}
+
+message QueryProfileByWalletResponse {
+  Profile profile = 1;
+}
+
+// QueryProfilesRequest is the request type for Profiles RPC.
+message QueryProfilesRequest {}
+
+message QueryProfilesResponse {
+  repeated Profile profiles = 1;
+}
+
+// Profile defines the identity profile structure.
+message Profile {
+  string profile_id = 1;
+  string primary_address = 2 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  repeated string linked_addresses = 3 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  string username = 4;
+  string metadata_uri = 5;
+  int64 created_at = 6;
+  int64 updated_at = 7;
+}

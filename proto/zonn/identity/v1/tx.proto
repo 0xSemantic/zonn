@@ -1,0 +1,42 @@
+syntax = "proto3";
+package zonn.identity.v1;
+
+import "gogoproto/gogo.proto";
+import "cosmos_proto/cosmos.proto";
+import "google/api/annotations.proto";
+import "cosmos/msg/v1/msg.proto";
+
+option go_package = "github.com/0xSemantic/zonn/x/identity/types";
+
+// MsgCreateProfile defines the message to create a new profile.
+message MsgCreateProfile {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  string username = 2;
+  string metadata_uri = 3;
+}
+
+message MsgCreateProfileResponse {
+  string profile_id = 1;
+}
+
+// MsgLinkWallet defines the message to link an additional wallet.
+message MsgLinkWallet {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  string profile_id = 2;
+  string wallet_address = 3 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+}
+
+message MsgLinkWalletResponse {}
+
+// MsgUpdateProfile defines the message to update username or metadata.
+message MsgUpdateProfile {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  string profile_id = 2;
+  string username = 3;
+  string metadata_uri = 4;
+}
+
+message MsgUpdateProfileResponse {}
